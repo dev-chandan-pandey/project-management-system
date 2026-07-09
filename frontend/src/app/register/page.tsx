@@ -44,8 +44,19 @@ export default function RegisterPage() {
     }
   }, [token, router]);
 
+  // const handleChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     [e.target.name]: e.target.value,
+  //   }));
+  // };
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement
+    >
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -96,7 +107,7 @@ export default function RegisterPage() {
     } catch (err: any) {
       setError(
         err.response?.data?.message ??
-          "Registration failed."
+        "Registration failed."
       );
     } finally {
       setLoading(false);
@@ -124,7 +135,7 @@ export default function RegisterPage() {
 
         <form
           onSubmit={submit}
-          className="mt-6 space-y-5"
+          className="mt-2 space-y-5"
         >
           <div>
 
@@ -179,22 +190,48 @@ export default function RegisterPage() {
 
           <div>
 
-            <label className="mb-2 block font-medium">
+            {/* <label className="mb-2 block font-medium">
               Account Type
-            </label>
+            </label> */}
+            <div>
 
-            <input
+              <label className="mb-2 block font-medium">
+                Account Type
+              </label>
+
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Admin">
+                  Admin
+                </option>
+
+                <option value="Project Manager">
+                  Project Manager
+                </option>
+
+                <option value="Team Member">
+                  Team Member
+                </option>
+              </select>
+
+            </div>
+
+            {/* <input
               value="Team Member"
               disabled
               className="w-full rounded-lg border bg-gray-100 p-3 text-gray-600"
-            />
+            /> */}
 
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            className="w-full rounded-lg bg-blue-600 py-5 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
             {loading
               ? "Creating Account..."
@@ -203,7 +240,7 @@ export default function RegisterPage() {
 
         </form>
 
-        <p className="mt-6 text-center text-gray-600">
+        <p className="mt-5 text-center text-gray-600">
 
           Already have an account?{" "}
 
