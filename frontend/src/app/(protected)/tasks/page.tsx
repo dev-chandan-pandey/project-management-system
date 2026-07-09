@@ -71,13 +71,20 @@ export default function TasksPage() {
   };
 
   const loadUsers = async () => {
-    try {
-      const res = await api.get("/users");
-      setUsers(res.data.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  try {
+    const res = await api.get("/users", {
+      params: {
+        page: 1,
+        limit: 1000,
+      },
+    });
+
+    setUsers(res.data.data.users ?? []);
+  } catch (error) {
+    console.error(error);
+    setUsers([]);
+  }
+};
 
   const loadProjects = async () => {
     try {
