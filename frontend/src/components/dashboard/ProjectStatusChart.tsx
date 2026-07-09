@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   Tooltip,
-  ResponsiveContainer,
   Legend,
 } from "recharts";
 
@@ -19,14 +19,13 @@ interface Props {
 }
 
 const COLORS = [
-  "#3B82F6", // Todo
-  "#F59E0B", // In Progress
+  "#6B7280", // Planning
+  "#3B82F6", // Active
   "#22C55E", // Completed
-  "#8B5CF6",
-  "#EF4444",
+  "#EF4444", // Archived
 ];
 
-export default function TaskStatusChart({
+export default function ProjectStatusChart({
   data,
 }: Props) {
   const total = data.reduce(
@@ -44,23 +43,23 @@ export default function TaskStatusChart({
         <div>
 
           <h2 className="text-lg font-bold">
-            Task Status
+            Project Status
           </h2>
 
           <p className="text-sm text-gray-500">
-            Distribution of all tasks
+            Distribution of all projects
           </p>
 
         </div>
 
         <div className="text-right">
 
-          <div className="text-3xl font-bold text-blue-600">
+          <div className="text-3xl font-bold text-indigo-600">
             {total}
           </div>
 
           <div className="text-sm text-gray-500">
-            Total Tasks
+            Total Projects
           </div>
 
         </div>
@@ -75,7 +74,7 @@ export default function TaskStatusChart({
 
           <div className="flex h-full items-center justify-center text-gray-500">
 
-            No task data available
+            No project data available
 
           </div>
 

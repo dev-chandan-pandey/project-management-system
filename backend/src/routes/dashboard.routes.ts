@@ -1,18 +1,40 @@
-// Dashboard routes placeholder
 import { Router } from "express";
 
 import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
 
-import { getDashboardStats } from "../controllers/dashboard.controller";
+import {
+  getDashboardStats,
+} from "../controllers/dashboard.controller";
 
 const router = Router();
 
+/*
+|--------------------------------------------------------------------------
+| All Dashboard Routes Require Authentication
+|--------------------------------------------------------------------------
+*/
+
 router.use(authenticate);
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+| Admin
+| Project Manager
+| Team Member
+|--------------------------------------------------------------------------
+*/
+
 router.get(
-    "/",
-    authenticate,
-    getDashboardStats
+  "/",
+  authorize(
+    "Admin",
+    "Project Manager",
+    "Team Member"
+  ),
+  getDashboardStats
 );
 
 export default router;

@@ -96,6 +96,85 @@ export const updateProject = asyncHandler(
     return res.json(new ApiResponse(true, "Project updated", project));
   }
 );
+export const assignProjectMembers = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { members } = req.body;
+ console.log("✅ assignProjectMembers reached");
+    if (!Array.isArray(members)) {
+      throw new ApiError(
+        400,
+        "Members must be an array."
+      );
+    }
+
+    const project = await Project.findById(
+      req.params.id
+    );
+
+    if (!project) {
+      throw new ApiError(
+        404,
+        "Project not found."
+      );
+    }
+
+    // Remove project from previously assigned users
+    await User.updateMany(
+      {
+        assignedProjects: project._id,
+      } as any,
+      {
+        $pull: {
+          assignedProjects: project._id,
+        },
+      }
+    );
+
+    // Add project to new members
+    await User.updateMany(
+      {
+        _id: {
+          $in: members,
+        },
+      },
+      {
+        $addToSet: {
+          assignedProjects: project._id,
+        },
+      }
+    );
+
+    project.members = members;
+
+    await project.save();
+
+    await logActivity({
+      action: "Project Members Updated",
+      description: `Members updated for ${project.name}`,
+      user: req.user!._id.toString(),
+      project: project._id.toString(),
+    });
+
+    const populatedProject =
+      await Project.findById(project._id)
+        .populate(
+          "members",
+          "name email role"
+        )
+        .populate(
+          "createdBy",
+          "name email"
+        );
+
+    return res.json(
+      new ApiResponse(
+        true,
+        "Project members updated successfully.",
+        populatedProject
+      )
+    );
+  }
+);
 
 export const deleteProject = asyncHandler(
   async (req: AuthRequest, res: Response) => {

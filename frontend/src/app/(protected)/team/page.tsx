@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import api from "@/services/api";
 
 import TeamTable from "@/components/team/TeamTable";
 import TeamCard from "@/components/team/TeamCard";
+
+import EditUserModal from "@/components/team/EditUserModal";
+import AssignProjectModal from "@/components/team/AssignProjectModal";
 
 interface Project {
   _id: string;
@@ -44,8 +48,19 @@ export default function TeamPage() {
 
   const [page, setPage] = useState(1);
 
-  const [totalPages, setTotalPages] =
-    useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [selectedUser, setSelectedUser] =
+    useState<User | null>(null);
+
+  const [editOpen, setEditOpen] =
+    useState(false);
+
+  const [assignOpen, setAssignOpen] =
+    useState(false);
+
+  const [saving, setSaving] =
+    useState(false);
 
   const loadUsers = async () => {
     try {
@@ -76,6 +91,55 @@ export default function TeamPage() {
     loadUsers();
   }, [search, role, page]);
 
+  const updateUser = async (
+    data: {
+      name: string;
+      email: string;
+      role: UserRole;
+    }
+  ) => {
+    if (!selectedUser) return;
+
+    try {
+      setSaving(true);
+
+      await api.put(
+        `/users/${selectedUser._id}`,
+        data
+      );
+
+      setEditOpen(false);
+
+      setSelectedUser(null);
+
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteUser = async (
+    id: string
+  ) => {
+    if (
+      !confirm(
+        "Delete this user?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await api.delete(`/users/${id}`);
+
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="py-20 text-center">
@@ -85,113 +149,158 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-        <div>
+          <div>
 
-          <h1 className="text-3xl font-bold">
-            Team Management
-          </h1>
+            <h1 className="text-3xl font-bold">
+              Team Management
+            </h1>
 
-          <p className="text-gray-500">
-            Manage your organization members.
-          </p>
-
-        </div>
-
-        <div className="flex gap-3">
-
-          <input
-            placeholder="Search member..."
-            className="rounded-lg border p-3"
-            value={search}
-            onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
-            }}
-          />
-
-          <select
-            value={role}
-            onChange={(e) => {
-              setPage(1);
-              setRole(e.target.value);
-            }}
-            className="rounded-lg border p-3"
-          >
-            <option value="">
-              All Roles
-            </option>
-
-            <option value="Admin">
-              Admin
-            </option>
-
-            <option value="Project Manager">
-              Project Manager
-            </option>
-
-            <option value="Team Member">
-              Team Member
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-      {users.length === 0 ? (
-        <div className="rounded-lg border bg-white p-10 text-center text-gray-500">
-          No users found.
-        </div>
-      ) : (
-        <>
-          <TeamTable users={users} />
-
-          <div className="grid gap-6 md:grid-cols-2 xl:hidden">
-
-            {users.map((user) => (
-              <TeamCard
-                key={user._id}
-                user={user}
-              />
-            ))}
+            <p className="text-gray-500">
+              Manage users and assignments.
+            </p>
 
           </div>
-        </>
-      )}
 
-      <div className="flex items-center justify-center gap-4">
+          <div className="flex gap-3">
 
-        <button
-          disabled={page === 1}
-          onClick={() =>
-            setPage((prev) => prev - 1)
-          }
-          className="rounded border px-4 py-2 disabled:opacity-50"
-        >
-          Previous
-        </button>
+            <input
+              placeholder="Search..."
+              className="rounded-lg border p-3"
+              value={search}
+              onChange={(e) => {
+                setPage(1);
+                setSearch(e.target.value);
+              }}
+            />
 
-        <span>
-          {page} / {totalPages}
-        </span>
+            <select
+              value={role}
+              onChange={(e) => {
+                setPage(1);
+                setRole(e.target.value);
+              }}
+              className="rounded-lg border p-3"
+            >
+              <option value="">
+                All Roles
+              </option>
 
-        <button
-          disabled={page === totalPages}
-          onClick={() =>
-            setPage((prev) => prev + 1)
-          }
-          className="rounded border px-4 py-2 disabled:opacity-50"
-        >
-          Next
-        </button>
+              <option value="Admin">
+                Admin
+              </option>
+
+              <option value="Project Manager">
+                Project Manager
+              </option>
+
+              <option value="Team Member">
+                Team Member
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        {users.length === 0 ? (
+          <div className="rounded-lg border bg-white p-12 text-center">
+            No users found.
+          </div>
+        ) : (
+          <>
+            <TeamTable
+              users={users}
+              onEdit={(user) => {
+                setSelectedUser(user);
+                setEditOpen(true);
+              }}
+              onAssign={(user) => {
+                setSelectedUser(user);
+                setAssignOpen(true);
+              }}
+              onDelete={deleteUser}
+            />
+
+            <div className="grid gap-6 md:grid-cols-2 xl:hidden">
+
+              {users.map((user) => (
+                <TeamCard
+                  key={user._id}
+                  user={user}
+                  onEdit={(user) => {
+                    setSelectedUser(user);
+                    setEditOpen(true);
+                  }}
+                  onAssign={(user) => {
+                    setSelectedUser(user);
+                    setAssignOpen(true);
+                  }}
+                  onDelete={deleteUser}
+                />
+              ))}
+
+            </div>
+          </>
+        )}
+
+        <div className="flex justify-center gap-4">
+
+          <button
+            disabled={page === 1}
+            onClick={() =>
+              setPage((p) => p - 1)
+            }
+            className="rounded border px-4 py-2 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span>
+            {page} / {totalPages}
+          </span>
+
+          <button
+            disabled={
+              page === totalPages
+            }
+            onClick={() =>
+              setPage((p) => p + 1)
+            }
+            className="rounded border px-4 py-2 disabled:opacity-50"
+          >
+            Next
+          </button>
+
+        </div>
 
       </div>
 
-    </div>
+      <EditUserModal
+        open={editOpen}
+        user={selectedUser}
+        loading={saving}
+        onClose={() => {
+          setEditOpen(false);
+          setSelectedUser(null);
+        }}
+        onSave={updateUser}
+      />
+
+      <AssignProjectModal
+        open={assignOpen}
+        user={selectedUser}
+        onClose={() => {
+          setAssignOpen(false);
+          setSelectedUser(null);
+        }}
+        onSuccess={loadUsers}
+      />
+    </>
   );
 }

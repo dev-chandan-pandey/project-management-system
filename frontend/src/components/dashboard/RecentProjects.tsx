@@ -1,53 +1,116 @@
-interface Props{
-projects:any[]
+"use client";
+
+import Link from "next/link";
+
+interface Project {
+  _id: string;
+  name: string;
+  status: string;
+  createdAt?: string;
 }
+
+interface Props {
+  projects: Project[];
+}
+
+const statusColor: Record<string, string> = {
+  Planning: "bg-gray-100 text-gray-700",
+
+  Active: "bg-green-100 text-green-700",
+
+  Completed: "bg-blue-100 text-blue-700",
+
+  Archived: "bg-red-100 text-red-700",
+};
 
 export default function RecentProjects({
-projects
-}:Props){
+  projects,
+}: Props) {
+  return (
+    <div className="rounded-xl border bg-white shadow">
 
-return(
+      {/* Header */}
 
-<div className="bg-white rounded-lg shadow p-5">
+      <div className="flex items-center justify-between border-b p-5">
 
-<h2 className="font-bold mb-4">
+        <div>
 
-Recent Projects
+          <h2 className="text-lg font-bold">
+            Recent Projects
+          </h2>
 
-</h2>
+          <p className="text-sm text-gray-500">
+            Latest created projects
+          </p>
 
-<div className="space-y-3">
+        </div>
 
-{
+        <Link
+          href="/projects"
+          className="text-sm font-medium text-blue-600 hover:underline"
+        >
+          View All
+        </Link>
 
-projects.map(project=>(
+      </div>
 
-<div
-key={project._id}
-className="border rounded p-3">
+      {/* Content */}
 
-<h3>
+      <div>
 
-{project.name}
+        {projects.length === 0 ? (
 
-</h3>
+          <div className="p-10 text-center text-gray-500">
+            No projects available
+          </div>
 
-<p>
+        ) : (
 
-{project.status}
+          projects.map((project) => (
 
-</p>
+            <div
+              key={project._id}
+              className="flex items-center justify-between border-b p-5 transition hover:bg-gray-50 last:border-b-0"
+            >
 
-</div>
+              <div>
 
-))
+                <h3 className="font-semibold text-gray-900">
+                  {project.name}
+                </h3>
 
-}
+                {project.createdAt && (
 
-</div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Created{" "}
+                    {new Date(
+                      project.createdAt
+                    ).toLocaleDateString()}
+                  </p>
 
-</div>
+                )}
 
-)
+              </div>
 
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  statusColor[
+                    project.status
+                  ] ??
+                  "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {project.status}
+              </span>
+
+            </div>
+
+          ))
+
+        )}
+
+      </div>
+
+    </div>
+  );
 }

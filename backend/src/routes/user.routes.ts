@@ -1,29 +1,47 @@
 import { Router } from "express";
 
 import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
 
 import {
-  getUser,
   getUsers,
+  getUser,
+  updateUser,
+  deleteUser,
 } from "../controllers/user.controller";
-import { authorize } from "../middleware/role.middleware";
 
 const router = Router();
 
 router.use(authenticate);
 
+/*
+|--------------------------------------------------------------------------
+| Admin Only
+|--------------------------------------------------------------------------
+*/
+
 router.get(
-    "/",
-    authenticate,
-    authorize("Admin"),
-    getUsers
+  "/",
+  authorize("Admin"),
+  getUsers
 );
 
 router.get(
-    "/:id",
-    authenticate,
-    authorize("Admin"),
-    getUser
+  "/:id",
+  authorize("Admin"),
+  getUser
+);
+
+router.put(
+  "/:id",
+  authorize("Admin"),
+  updateUser
+);
+
+router.delete(
+  "/:id",
+  authorize("Admin"),
+  deleteUser
 );
 
 export default router;

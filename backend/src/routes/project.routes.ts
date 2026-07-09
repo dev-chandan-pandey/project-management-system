@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  assignProjectMembers,
   createProject,
   deleteProject,
   getProject,
@@ -11,7 +12,7 @@ import { authorize } from "../middleware/role.middleware";
 
 const router = Router();
 
-router.use(authenticate);
+// router.use(authenticate);
 
 router.get("/", authenticate, getProjects);
 
@@ -29,6 +30,13 @@ router.put(
   authenticate,
   authorize("Admin", "Project Manager"),
   updateProject
+);
+
+router.put(
+  "/:id/members",
+  authenticate,
+  authorize("Admin", "Project Manager"),
+  assignProjectMembers
 );
 
 router.delete(
