@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type ProjectStatus =
-  | "Planning"
-  | "Active"
-  | "Completed"
-  | "Archived";
+type ProjectStatus = "Planning" | "Active" | "Completed" | "Archived";
 
 interface Project {
   _id: string;
@@ -38,24 +34,16 @@ const initialForm: ProjectFormData = {
   status: "Planning",
 };
 
-export default function ProjectForm({
-  project,
-  onSubmit,
-}: Props) {
-  const [form, setForm] =
-    useState<ProjectFormData>(initialForm);
+export default function ProjectForm({ project, onSubmit }: Props) {
+  const [form, setForm] = useState<ProjectFormData>(initialForm);
 
   useEffect(() => {
     if (project) {
       setForm({
         name: project.name,
         description: project.description,
-        startDate: project.startDate
-          ? project.startDate.substring(0, 10)
-          : "",
-        endDate: project.endDate
-          ? project.endDate.substring(0, 10)
-          : "",
+        startDate: project.startDate ? project.startDate.substring(0, 10) : "",
+        endDate: project.endDate ? project.endDate.substring(0, 10) : "",
         status: project.status,
       });
     } else {
@@ -64,11 +52,7 @@ export default function ProjectForm({
   }, [project]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLTextAreaElement |
-      HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -81,22 +65,18 @@ export default function ProjectForm({
       alert("Project name is required.");
       return;
     }
-
     if (!form.description.trim()) {
       alert("Project description is required.");
       return;
     }
-
     if (!form.startDate) {
       alert("Please select a start date.");
       return;
     }
-
     if (!form.endDate) {
       alert("Please select an end date.");
       return;
     }
-
     if (form.endDate < form.startDate) {
       alert("End date cannot be earlier than start date.");
       return;
@@ -107,7 +87,6 @@ export default function ProjectForm({
 
   return (
     <div className="space-y-4">
-
       <input
         name="name"
         placeholder="Project Name"
@@ -126,13 +105,10 @@ export default function ProjectForm({
       />
 
       <div className="grid grid-cols-2 gap-4">
-
         <div>
-
           <label className="mb-1 block text-sm font-medium text-gray-600">
             Start Date
           </label>
-
           <input
             type="date"
             name="startDate"
@@ -140,15 +116,12 @@ export default function ProjectForm({
             onChange={handleChange}
             className="w-full rounded-lg border p-3"
           />
-
         </div>
 
         <div>
-
           <label className="mb-1 block text-sm font-medium text-gray-600">
             End Date
           </label>
-
           <input
             type="date"
             name="endDate"
@@ -156,9 +129,7 @@ export default function ProjectForm({
             onChange={handleChange}
             className="w-full rounded-lg border p-3"
           />
-
         </div>
-
       </div>
 
       <select
@@ -167,22 +138,10 @@ export default function ProjectForm({
         onChange={handleChange}
         className="w-full rounded-lg border p-3"
       >
-        <option value="Planning">
-          Planning
-        </option>
-
-        <option value="Active">
-          Active
-        </option>
-
-        <option value="Completed">
-          Completed
-        </option>
-
-        <option value="Archived">
-          Archived
-        </option>
-
+        <option value="Planning">Planning</option>
+        <option value="Active">Active</option>
+        <option value="Completed">Completed</option>
+        <option value="Archived">Archived</option>
       </select>
 
       <button
@@ -192,7 +151,6 @@ export default function ProjectForm({
       >
         {project ? "Update Project" : "Create Project"}
       </button>
-
     </div>
   );
 }
