@@ -22,7 +22,7 @@ router.use(authenticate);
 
 router.get(
   "/",
-  authorize("Admin"),
+  authorize("Admin", "Project Manager"),
   getUsers
 );
 
