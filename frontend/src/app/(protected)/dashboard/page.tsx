@@ -218,7 +218,7 @@ export default function DashboardPage() {
 
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* <div className="grid gap-6 lg:grid-cols-2">
 
         <RecentProjects
           projects={dashboard.recentProjects}
@@ -228,7 +228,7 @@ export default function DashboardPage() {
           tasks={dashboard.latestTasks}
         />
 
-      </div>
+      </div> */}
 
       {/* Lists */}
 
